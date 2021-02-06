@@ -1,5 +1,4 @@
 #include <iostream>
-#include <map>
 #include <algorithm>
 #include <vector>
 
@@ -9,11 +8,8 @@ int main(){
 
     std::cin >> A >> B >> N;
 
-    int Bstack = 0; 
-    int Rstack = 0;
-
-    std::map<int, int> Bmap;
-    std::map<int, int> Rmap;
+    std::vector<std::pair<int, int>> Bv;
+    std::vector<std::pair<int, int>> Rv;
 
     for(int i=0; i<N; i++){
         int x, z;
@@ -22,79 +18,96 @@ int main(){
         std::cin >> x >> ch >> z;
 
         if(ch == 'B'){
-            Bmap[x] = z;
+            Bv.push_back(std::make_pair(x, z));
 
         }
         else if(ch == 'R'){
-            Rmap[x] = z;
+            Rv.push_back(std::make_pair(x, z));
         }
     }
 
-    // std::for_each(Bmap.begin(), Bmap.end(), [&](std::pair<int, int> itr) {
-    //     std::cout << itr.first << " " << itr.second << std::endl;
-    //     });
-
-    //count: 없으면 0 있으면 1
-    // std::cout << Bmap.count(2);
-    
-    // if(Bmap.count(1)){
-    //     std::cout << "\n zonzai! " << Bmap[1];
-    // }
-
-    int Aiswork = 0;
-    int Biswork = 0;
+    int count = 1;
 
     std::vector<int> Acount;
     std::vector<int> Bcount;
 
-    int count = 1;
-    int clock = 1;
     while(1){
-        // 시간이 1초씩 흐른다.
-        if(Bmap.count(clock)){
-            Bstack += Bmap[clock];
-            Bmap.erase(clock);
-        }
-        else if(Rmap.count(clock)){
-            Rstack += Rmap[clock];
-            Rmap.erase(clock);
-        }
-
-        // std::cout << "stacks: " << Bstack << " " << Rstack << " time: " << clock << std::endl;
-
-        // A가 일하는 중이면
-        if(Aiswork >0){
-            Aiswork -= 1;
-        }
-        // A가 놀고있고 물건 B가 1개이상이면
-        
-        if((Aiswork == 0) && (Bstack > 0)){
-            Acount.push_back(count);
-            count += 1;
-            Aiswork = A;
-            Bstack -= 1;
-        }
-
-        // B가 일하는 중이면
-        if(Biswork > 0){
-            Biswork -= 1;
-        }
-        // B가 놀고있고 물건 R이 1개 이상이면
-        if((Biswork == 0) && (Rstack > 0)){
-            Bcount.push_back(count);
-            count += 1;
-            Biswork = B;
-            Rstack -= 1;
-        }
-        
-        // std::cout << "stacks: " << Bstack << " " << Rstack << " time: " << clock << std::endl;
-
-        // 일 없으면
-        if(Bmap.empty() && Rmap.empty() && (Bstack == 0) && (Rstack == 0)){
+        //더이상 포장할게 없다는 뜻.
+        if(Bv.empty() && Rv.empty()){
             break;
         }
 
-        clock += 1;
+        //선물이 없으면 다음 선물 갖고와야지
+        if(!Bv.empty() && Bv[0].second == 0){
+            if(Bv.size() == 1){
+                Bv.clear();
+                continue;
+            }
+            else{
+                int temp1 = Bv[0].first;
+                int temp2 = Bv[1].first;
+
+                Bv.erase(Bv.begin());
+
+                if(temp1 >= temp2){
+                    Bv[0].first = temp1;
+                } 
+            }
+        }
+
+        if(!Rv.empty() && Rv[0].second == 0){
+            if(Rv.size() == 1){
+                Rv.clear();
+                continue;
+            }
+            else{
+                int temp1 = Rv[0].first;
+                int temp2 = Rv[1].first;
+
+                Rv.erase(Rv.begin());
+
+                if(temp1 >= temp2){
+                    Rv[0].first = temp1;
+                }   
+            }
+        }
+
+        //A가 일없으면 B가 일해야지
+        if(Bv.empty()){
+            Rv[0].first += B;
+            Rv[0].second -= 1;
+
+            Bcount.push_back(count);
+
+            count += 1;
+        }
+        else if(Rv.empty()){
+            Bv[0].first += A;
+            Bv[0].second -= 1;
+
+            Acount.push_back(count);
+
+            count += 1;
+        }
+        else{
+            // 더 빠른놈이 선물 가져감 
+            if(Bv[0].first <= Rv[0].first){
+                Bv[0].first += A;
+                Bv[0].second -= 1;
+
+                Acount.push_back(count);
+
+                count += 1;
+            }
+            else if(Bv[0].first > Rv[0].first){
+                Rv[0].first += B;
+                Rv[0].second -= 1;
+
+                Bcount.push_back(count);
+
+                count += 1;
+            }
+        }
     }
 
     std::cout << Acount.size() << std::endl;
