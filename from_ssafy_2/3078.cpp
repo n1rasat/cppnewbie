@@ -21,44 +21,36 @@ int main(){
     
     std::string s;
 
+    long long result = 0;
+
     for(int i=1; i<=N; i++){
         std::string s;
         std::cin >> s;
 
-        vecarr[s.length()].push_back(i);
-    }
+        int slen = s.length();
 
-    std::vector<std::pair<int, int>> result_pair;
+        // 입력될때마다 그 이름 길이 배열에 원소가 있는지 본다
+        while(!vecarr[slen].empty()){
+            int comparelen = vecarr[slen].front();
 
-    for(int i=2; i<=20; i++){
-        if(!vecarr[i].empty()){
-            for(int j=0; j<vecarr[i].size(); j++){
-                // 거기에 학생이 있으면
-                // 0 ~ K차이까지 보고
-                // 1 ~ K차이까지 보고
-                // 근데 이게 중복이 되면 안됨. 그러니까 (int1, int2) pair를 만들어서 
-                // 이 (pair)가 순서 상관없는 set이어야함.
-                // 그냥 (int1, int2), (int2, int1) 둘 다 넣고 마지막에 /2 하면 될 듯?
-
-                // std::cout << i << "! " << std::endl;
-                for(int k=j+1; k<vecarr[i].size(); k++){
-                    if(vecarr[i][k] - vecarr[i][j] > K){
-                        break;
-                    }
-                    // std::cout << "[i][j]: " << vecarr[i][j] << " [i][k]: " << vecarr[i][k] << std::endl;
-                    else if(vecarr[i][k] - vecarr[i][j] <= K){ 
-                        // 찾아보고 없으면 넣기
-                        if(std::find(result_pair.begin(), result_pair.end(), std::make_pair(vecarr[i][j], vecarr[i][k])) == result_pair.end()){
-                            result_pair.push_back(std::make_pair(vecarr[i][j], vecarr[i][k]));
-                            result_pair.push_back(std::make_pair(vecarr[i][k], vecarr[i][j]));
-                        }
-                    }
-                }
+            // 어짜피 등수대로 들어오니까 
+            if(i - comparelen <= K){
+                result += vecarr[slen].size();
+                break;
             }
+            else{
+                // K 보다 더 많이 차이나면 쳐냄
+                vecarr[slen].erase(vecarr[slen].begin());
+            }
+
         }
+
+        vecarr[slen].push_back(i);
     }
 
-    std::cout << result_pair.size() / 2;
+    std::cout << result;
+
+    // 다 넣어놓고 비교하니까 Timeout 발생.
 
     return 0;
 }
