@@ -1,9 +1,9 @@
 #include <iostream>
 #include <algorithm>
+#include <vector>
 
-int ship[51];
-int box[10001];
-int visited[10001] = {0, };
+std::vector<int> shipp;
+std::vector<int> boxx;
 
 int main(){
 
@@ -13,8 +13,8 @@ int main(){
 
     for(int i=0; i<N; i++){
         int x;
-        std::cin >> x;
-        ship[i] = x;
+        scanf("%d", &x);
+        shipp.push_back(x);
     }
 
     int M;
@@ -23,45 +23,47 @@ int main(){
 
     for(int i=0; i<M; i++){
         int x;
-        std::cin >> x;
-        box[i] = x;
+        scanf("%d", &x);
+        boxx.push_back(x);
     }
 
-    std::sort(ship, ship+50, std::greater<int>());
-    std::sort(box, box+10000, std::greater<int>());
+    std::sort(shipp.begin(), shipp.end(), std::greater<int>());
+    std::sort(boxx.begin(), boxx.end(), std::greater<int>());
 
     int box_count = 0;
     int playtime = 0;
 
-    if(box[0] > ship[0]){
+    if(boxx[0] > shipp[0]){
         std::cout << -1;
         return 0;
     }
 
     while(1){
-        if(box_count == M){
+        // 남은 박스가 없으면 종료
+        if(boxx.empty()){
             break;
         }
 
-        for(int i=0; i<N;i++){
-            for(int j=0; j<M; j++){
-                // visited == 0 이고 ship >= box면 visited == 1로 하고 다음 박스로
-                if(visited[j] == 0 && ship[i] >= box[j]){
-                    visited[j] = 1;
-                    box_count += 1;
-                    // 다음 배로
-                    i += 1;
-                }
-                else{
-                    continue;
-                }
+        int i=0;
+        int j=0;
+
+        while(i < N){
+            // 박스 끝까지 봤으면 종료
+            if(j == boxx.size()){
+                break;
+            }
+            if(shipp[i] >= boxx[j]){
+                boxx.erase(boxx.begin()+j);
+                i++;
+            }
+            else if(shipp[i] < boxx[j]){
+                j++;
             }
         }
         playtime += 1;
     }
 
     std::cout << playtime;
-
 
     return 0;
 }
