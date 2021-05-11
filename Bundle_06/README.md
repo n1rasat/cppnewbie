@@ -1,4 +1,4 @@
-# Bundle 3
+# Bundle 6
 
 BOJ 12100 - 2048 (Easy)
 
